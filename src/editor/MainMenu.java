@@ -12,6 +12,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.UIManager;
+
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,108 +29,50 @@ public class MainMenu extends JFrame implements ActionListener{
 	private JPanel pnlMain;
 	private JTextField txtDirectoryPath, txtCustomGenre;
 	private JLabel lblDirectory, lblError;
-	private JRadioButton rdbtnDeathcore, rdbtnPopPunk, rdbtnOther, rdbtnSingle, rdbtnList;
+	private JRadioButton rdbtnGenre1, rdbtnGenre2, rdbtnGenreOther, rdbtnSingleCD, rdbtnManyCDs;
 	private ButtonGroup typeSelector, genreSelector;
 	private JCheckBox chkIgnoreArtwork;
-	private JButton btnDone, btnFileChooser;
-	private JTextArea taLog;
+	private JButton btnFormat, btnChooseFile;
+	private JTextArea taOutputLog;
 	private JScrollPane scrollLog;
+	private CDFormatter formatter;
 	
-	public MainMenu() {
-		setTitle("MP3 Tag Formatter");
-	    setSize(469, 388);
-	    setResizable(false);
-	    setLocationRelativeTo(null);
-	    setDefaultCloseOperation(EXIT_ON_CLOSE);
-	    
-	    Color blue = new Color(26, 140, 149);
+	public MainMenu() 
+	{
+		this.setTitle("MP3 Tag Formatter");
+	    this.setSize(674, 295);
+	    this.setResizable(false);
+	    this.setLocationRelativeTo(null);
+	    this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 	    
 	    pnlMain = new JPanel();
 		pnlMain.setLayout(null);
-		pnlMain.setBackground(blue);
+		pnlMain.setBackground(new Color(0, 128, 0));
+		this.getContentPane().add(pnlMain);
 		
-		getContentPane().add(pnlMain);
-		
-		btnFileChooser = new JButton("...");
-		btnFileChooser.setToolTipText("Select A File Location");
-		btnFileChooser.setBounds(413, 40, 37, 25);
-		btnFileChooser.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				openJFileChooser();
-			}
-		});
-		pnlMain.add(btnFileChooser);
+		btnChooseFile = new JButton("...");
+		btnChooseFile.setToolTipText("Select A File Location");
+		btnChooseFile.setBounds(608, 37, 42, 25);
+		btnChooseFile.setActionCommand("ChooseFile");
+		btnChooseFile.addActionListener(this);
+		pnlMain.add(btnChooseFile);
 		
 		txtDirectoryPath = new JTextField();
 		txtDirectoryPath.setEditable(false);
-		txtDirectoryPath.setBounds(21, 40, 382, 25);
+		txtDirectoryPath.setBounds(92, 37, 506, 25);
 		pnlMain.add(txtDirectoryPath);
-		txtDirectoryPath.setColumns(10);
 		
 		lblDirectory = new JLabel("Directory:");
 		lblDirectory.setForeground(Color.WHITE);
-		lblDirectory.setFont(new Font("Comic Sans MS", Font.PLAIN, 16));
-		lblDirectory.setBounds(21, 11, 78, 25);
+		lblDirectory.setFont(new Font("Times New Roman", Font.PLAIN, 15));
+		lblDirectory.setBounds(21, 37, 65, 25);
 		pnlMain.add(lblDirectory);
-		
-		rdbtnDeathcore = new JRadioButton("Deathcore");
-		rdbtnDeathcore.setFont(new Font("Tahoma", Font.BOLD, 14));
-		rdbtnDeathcore.setForeground(Color.ORANGE);
-		rdbtnDeathcore.setBackground(blue);
-		rdbtnDeathcore.setBounds(21, 75, 109, 20);
-		rdbtnDeathcore.setActionCommand("Deathcore");
-		rdbtnDeathcore.setSelected(true);
-		rdbtnDeathcore.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				txtCustomGenre.setEnabled(false);
-			}
-		});
-		pnlMain.add(rdbtnDeathcore);
-
-	    rdbtnPopPunk = new JRadioButton("Pop Punk");
-	    rdbtnPopPunk.setFont(new Font("Tahoma", Font.BOLD, 14));
-	    rdbtnPopPunk.setForeground(Color.ORANGE);
-	    rdbtnPopPunk.setBounds(21, 95, 109, 20);
-	    rdbtnPopPunk.setBackground(blue);
-		rdbtnPopPunk.setActionCommand("Pop Punk");
-		rdbtnPopPunk.setSelected(false);
-		rdbtnPopPunk.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				txtCustomGenre.setEnabled(false);
-			}
-		});
-		pnlMain.add(rdbtnPopPunk);
-		
-		rdbtnOther = new JRadioButton("Other");
-		rdbtnOther.setFont(new Font("Tahoma", Font.BOLD, 14));
-		rdbtnOther.setForeground(Color.ORANGE);
-		rdbtnOther.setBounds(21, 115, 109, 20);
-		rdbtnOther.setBackground(blue);
-		rdbtnOther.setActionCommand("Other");
-		rdbtnOther.setSelected(false);
-		rdbtnOther.addActionListener(new ActionListener(){
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				txtCustomGenre.setText("Metal");
-				txtCustomGenre.setEnabled(true);
-			}
-		});
-		pnlMain.add(rdbtnOther);
-		
-		 //Group the radio buttons.
-	    genreSelector = new ButtonGroup();
-	    genreSelector.add(rdbtnDeathcore);
-	    genreSelector.add(rdbtnPopPunk);
-	    genreSelector.add(rdbtnOther);
 		
 		chkIgnoreArtwork = new JCheckBox("Ignore Artwork");
 		chkIgnoreArtwork.setFont(new Font("Tahoma", Font.BOLD, 14));
 		chkIgnoreArtwork.setForeground(Color.ORANGE);
-		chkIgnoreArtwork.setBackground(blue);
-		chkIgnoreArtwork.setBounds(151, 139, 140, 23);
+		chkIgnoreArtwork.setBackground(new Color(0, 128, 0));
+		chkIgnoreArtwork.setBounds(169, 154, 135, 23);
 		chkIgnoreArtwork.setSelected(false);
 		pnlMain.add(chkIgnoreArtwork);
 		
@@ -136,193 +80,231 @@ public class MainMenu extends JFrame implements ActionListener{
 		txtCustomGenre.setToolTipText("This genre will be assigned to your songs.");
 		txtCustomGenre.setEnabled(false);
 		txtCustomGenre.setText("Enter a genre.");
-		txtCustomGenre.setBounds(21, 142, 109, 20);
+		txtCustomGenre.setBounds(21, 157, 109, 20);
 		pnlMain.add(txtCustomGenre);
 		
-		btnDone = new JButton("Format Songs");
-		btnDone.setBounds(274, 76, 176, 39);
-		btnDone.setActionCommand("Format");
-		btnDone.addActionListener(this);
-		pnlMain.add(btnDone);
-		
-		rdbtnList = new JRadioButton("Many CDs");
-		rdbtnList.setFont(new Font("Tahoma", Font.BOLD, 14));
-		rdbtnList.setForeground(Color.ORANGE);
-		rdbtnList.setBackground(blue);
-		rdbtnList.setSelected(true);
-		rdbtnList.setActionCommand("List");
-		rdbtnList.setBounds(151, 75, 109, 20);
-		pnlMain.add(rdbtnList);
-		
-		rdbtnSingle = new JRadioButton("Single CD");
-		rdbtnSingle.setFont(new Font("Tahoma", Font.BOLD, 14));
-		rdbtnSingle.setForeground(Color.ORANGE);
-		rdbtnSingle.setBackground(blue);
-		rdbtnSingle.setSelected(false);
-		rdbtnSingle.setActionCommand("Single");
-		rdbtnSingle.setBounds(151, 95, 109, 20);
-		pnlMain.add(rdbtnSingle);
-		
-		 //Group the radio buttons.
-	    typeSelector = new ButtonGroup();
-	    typeSelector.add(rdbtnSingle);
-	    typeSelector.add(rdbtnList);
+		btnFormat = new JButton("Format Songs");
+		btnFormat.setForeground(new Color(165, 42, 42));
+		btnFormat.setFont(new Font("Times New Roman", Font.BOLD, 24));
+		btnFormat.setBounds(21, 204, 265, 46);
+		btnFormat.setActionCommand("Format");
+		btnFormat.addActionListener(this);
+		pnlMain.add(btnFormat);
 	    
 	    lblError = new JLabel("Error");
 	    lblError.setForeground(Color.ORANGE);
-	    lblError.setFont(new Font("Comic Sans MS", Font.BOLD, 14));
-	    lblError.setBounds(118, 11, 332, 18);
+	    lblError.setFont(new Font("Times New Roman", Font.BOLD, 20));
+	    lblError.setBounds(92, 11, 506, 18);
 	    lblError.setVisible(false);
 	    pnlMain.add(lblError);
 	    
-	    taLog = new JTextArea();
-	    taLog.setMargin(new Insets(8, 8, 8, 8));
-	    taLog.setEditable(false);
-	    taLog.setLineWrap(true);
-	    taLog.setWrapStyleWord(true);
-	    taLog.setCaretPosition(taLog.getDocument().getLength());
+	    taOutputLog = new JTextArea();
+	    taOutputLog.setMargin(new Insets(8, 8, 8, 8));
+	    taOutputLog.setEditable(false);
+	    taOutputLog.setLineWrap(true);
+	    taOutputLog.setWrapStyleWord(true);
+	    taOutputLog.setCaretPosition(taOutputLog.getDocument().getLength());
 		
-		scrollLog = new JScrollPane(taLog);
-		scrollLog.setBounds(21, 173, 429, 77);
+		scrollLog = new JScrollPane(taOutputLog);
+		scrollLog.setBounds(307, 73, 343, 177);
 		scrollLog.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		pnlMain.add(scrollLog);
+		
+		// Type radio buttons
+		rdbtnManyCDs = new JRadioButton("Many CDs");
+		rdbtnManyCDs.setFont(new Font("Tahoma", Font.BOLD, 14));
+		rdbtnManyCDs.setForeground(Color.ORANGE);
+		rdbtnManyCDs.setBackground(new Color(0, 128, 0));
+		rdbtnManyCDs.setSelected(true);
+		rdbtnManyCDs.setActionCommand("List");
+		rdbtnManyCDs.setBounds(169, 84, 100, 20);
+		pnlMain.add(rdbtnManyCDs);
+		
+		rdbtnSingleCD = new JRadioButton("Single CD");
+		rdbtnSingleCD.setFont(new Font("Tahoma", Font.BOLD, 14));
+		rdbtnSingleCD.setForeground(Color.ORANGE);
+		rdbtnSingleCD.setBackground(new Color(0, 128, 0));
+		rdbtnSingleCD.setSelected(false);
+		rdbtnSingleCD.setActionCommand("Single");
+		rdbtnSingleCD.setBounds(169, 107, 109, 20);
+		pnlMain.add(rdbtnSingleCD);
+		
+		 //Group the radio buttons.
+	    typeSelector = new ButtonGroup();
+	    typeSelector.add(rdbtnSingleCD);
+	    typeSelector.add(rdbtnManyCDs);
+		
+		// Genre radio buttons
+		rdbtnGenre1 = new JRadioButton("Deathcore");
+		rdbtnGenre1.setFont(new Font("Tahoma", Font.BOLD, 14));
+		rdbtnGenre1.setForeground(Color.ORANGE);
+		rdbtnGenre1.setBackground(new Color(0, 128, 0));
+		rdbtnGenre1.setBounds(21, 84, 109, 20);
+		rdbtnGenre1.setActionCommand("Deathcore");
+		rdbtnGenre1.setSelected(true);
+		rdbtnGenre1.addActionListener(this);
+		pnlMain.add(rdbtnGenre1);
+
+	    rdbtnGenre2 = new JRadioButton("Pop Punk");
+	    rdbtnGenre2.setFont(new Font("Tahoma", Font.BOLD, 14));
+	    rdbtnGenre2.setForeground(Color.ORANGE);
+	    rdbtnGenre2.setBounds(21, 107, 100, 20);
+	    rdbtnGenre2.setBackground(new Color(0, 128, 0));
+		rdbtnGenre2.setActionCommand("Pop Punk");
+		rdbtnGenre2.setSelected(false);
+		rdbtnGenre2.addActionListener(this);
+		pnlMain.add(rdbtnGenre2);
+		
+		rdbtnGenreOther = new JRadioButton("Other");
+		rdbtnGenreOther.setFont(new Font("Tahoma", Font.BOLD, 14));
+		rdbtnGenreOther.setForeground(Color.ORANGE);
+		rdbtnGenreOther.setBounds(21, 130, 78, 20);
+		rdbtnGenreOther.setBackground(new Color(0, 128, 0));
+		rdbtnGenreOther.setActionCommand("Other");
+		rdbtnGenreOther.setSelected(false);
+		rdbtnGenreOther.addActionListener(this);
+		pnlMain.add(rdbtnGenreOther);
+		
+		 //Group the radio buttons.
+	    genreSelector = new ButtonGroup();
+	    genreSelector.add(rdbtnGenre1);
+	    genreSelector.add(rdbtnGenre2);
+	    genreSelector.add(rdbtnGenreOther);
 	    
-		///
-	    JTextArea taErrorLog = new JTextArea();
-	    taErrorLog.setBounds(21, 262, 429, 87);
-	    pnlMain.add(taErrorLog);
-	
+	    // set the style of the windows to match the system
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {}
 	}
 	
+	@Override
+	public void actionPerformed(ActionEvent event) 
+	{
+		// get action command
+		String eventActionCommand = event.getActionCommand();
+		
+		if(eventActionCommand.equals("Format") && !txtDirectoryPath.getText().trim().isEmpty()){
+			taOutputLog.setText("");
+			lblError.setVisible(false);
+			
+			if(rdbtnSingleCD.isSelected())
+				formatCD(txtDirectoryPath.getText());
+			else if(rdbtnManyCDs.isSelected())
+				formatCDList();
+			
+		}else if(eventActionCommand.equals("ChooseFile")){
+			openJFileChooser();
+		}else if(eventActionCommand.equals("Deathcore") || eventActionCommand.equals("Pop Punk")){
+			txtCustomGenre.setEnabled(false);
+		}else if(eventActionCommand.equals("Other")){
+			txtCustomGenre.setText("Metal");
+			txtCustomGenre.setEnabled(true);
+		}
+		
+	}
+
 	@SuppressWarnings("static-access")
-	private boolean openJFileChooser() {
+	private boolean openJFileChooser() 
+	{
 		JFileChooser chooser = new JFileChooser("C:\\Users\\Kucharskim\\Downloads");
 		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-		if(chooser.showOpenDialog(null) == chooser.APPROVE_OPTION){		
+		
+		if(chooser.showOpenDialog(null) == chooser.APPROVE_OPTION)	
 			txtDirectoryPath.setText(chooser.getSelectedFile().toString());
-		}
-		else{
+		else
 			System.out.println("No file selected.");	
-		}
+		
 		return true;
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent event) {
-		if(event.getSource() instanceof JButton){
-			JButton temp = (JButton) event.getSource();
-			if(temp.getActionCommand() == "Format"){
-				taLog.setText("");
-				lblError.setVisible(false);
-				
-				if(txtDirectoryPath.getText().isEmpty()){
-					lblError.setText("You have not selected a directory!");
-					lblError.setVisible(true);
-					return;
-				}
-				formatCD();
-			}
-		}
-	}
-	
-	public void formatCD(){
-		String genre;
-		if(genreSelector.getSelection().getActionCommand() == "Other"){
-			genre = txtCustomGenre.getText().toString(); 
-		}
-		else{
-			genre = genreSelector.getSelection().getActionCommand().toString();
-		}
-		if(rdbtnList.isSelected()){
-			File albumDirectoryParent = new File(txtDirectoryPath.getText());
-			ArrayList<File> cdList = new ArrayList<File>();
-			File[] cdFileList;
-			try{
-				cdFileList = albumDirectoryParent.listFiles();
-				for(int i = 0; i < cdFileList.length; i++){
-					if (cdFileList[i].isDirectory()) {
-						cdList.add(cdFileList[i]);
-					}
-				}
-			}catch(NullPointerException e){
-				lblError.setText("ERROR: Invalid Directory!");
-				lblError.setVisible(true);
-				return;
-			}
-			
-
-			if(cdList.size() < 2){
-				lblError.setText("You selected multiple CDs but there was < 1");
-				lblError.setVisible(true);
-				return;
-			}
-			
-			System.out.println("There are " + cdList.size() + " album folders in the working directory.\n");
-			
-			for(int cdNum = 0; cdNum < cdList.size(); cdNum++){
-				CDFormatter formatter;
-				try{
-					formatter = new CDFormatter(cdList.get(cdNum).toString(), genre);
-					formatter.setMenu(this);
-				}catch(NullPointerException e){
-					lblError.setText("ERROR: Invalid Directory!");
-					lblError.setVisible(true);
-					return;
-				}
-				formatter.printFileCount();
-				if(formatter.getNumberOfSongsInDir() == 0){
-					lblError.setText("There are no mp3 files in the directory you chose!");
-					lblError.setVisible(true);
-					continue;
-				}
-				setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-				if(!chkIgnoreArtwork.isSelected())	{
-					if(!formatter.embedCover())	{
-						System.out.println("\n***ERROR: Album cover Not Found. Could not find image in directory and extraction failed.*** \n" +
-								"***Skipping this directory.***\n");
-						setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-						continue;
-					}
-				}
-				formatter.doMagic();
-			}
-		}
-		else{
-			CDFormatter formatter;
-			try{
-				formatter = new CDFormatter(txtDirectoryPath.getText(), genre);
-				formatter.setMenu(this);
-			}catch(NullPointerException e){
-				lblError.setText("***ERROR: Directory cannot be found. Please select a valid directory.***");
-				lblError.setVisible(true);
-				return;
-			}
-			formatter.printFileCount();
-			if(formatter.getNumberOfSongsInDir() == 0){
-				lblError.setText("There are no mp3 files in the dir you chose!");
-				lblError.setVisible(true);
-				return;
-			}
-			setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-			if(!chkIgnoreArtwork.isSelected())	{ 
-				if(!formatter.embedCover())	{
-					System.out.println("\n***ERROR: Album cover Not Found. Could not find image in directory and extraction failed.*** \n" +
-							"***Skipping this directory.***\n");
-					setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-					return;
-				}
-			}
-			
-			formatter.doMagic();
-		}
-		setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));	
 	}
 	
 	public void addTextToLog(String text)
 	{
-		taLog.append(text+"\n");
-		taLog.setCaretPosition(taLog.getDocument().getLength());
-		validate();
-		repaint();
+		taOutputLog.append(text+"\n");
+		taOutputLog.setCaretPosition(taOutputLog.getDocument().getLength());
+	}
+	
+	public void formatCD(String CDdirectory)
+	{
+		// get genre from selection
+		String genre;
+		if(genreSelector.getSelection().getActionCommand().equals("Other"))
+			genre = txtCustomGenre.getText().toString(); 
+		else
+			genre = genreSelector.getSelection().getActionCommand().toString();
+		
+		try{
+			formatter = new CDFormatter(CDdirectory, genre);
+			formatter.setMenu(this);
+		}catch(NullPointerException e){
+			lblError.setText("***ERROR: Directory cannot be found. Please select a valid directory.***");
+			lblError.setVisible(true);
+			return;
+		}
+		
+		if(formatter.getMP3Count() <= 0)
+		{
+			lblError.setText("There are no mp3 files in the dir you chose!");
+			lblError.setVisible(true);
+			return;
+		}
+		
+		System.out.println("Working in directory \"" + formatter.getCurrentDirectory() + "\"");
+		System.out.println("There are " + formatter.getFileCount() + " files and " + formatter.getMP3Count() + " mp3 files in this directory.");
+		addTextToLog("Working in directory \"" + formatter.getCurrentDirectory() + "\"");
+		addTextToLog("There are " + formatter.getFileCount() + " files and " + formatter.getMP3Count() + " mp3 files in this directory.");
+			
+		setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			
+		if(!chkIgnoreArtwork.isSelected())	
+		{ 
+			if(!formatter.embedCover())	
+			{
+				System.out.println("\nWARNING: Album cover not found in directory and extraction failed. Saving default.");
+				if(!formatter.saveDefaultImage())
+				{
+					System.out.println("WARNING: Problem saving default image. Ignoring artwork.");
+					formatter.ignoreImage();
+				}
+			}
+		}else{
+			formatter.ignoreImage();
+		}
+		
+		formatter.format();
+		
+		setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));	
+	}
+	
+	private void formatCDList() 
+	{
+		File albumDirectoryParent = new File(txtDirectoryPath.getText());
+		ArrayList<File> cdList = new ArrayList<File>();
+		File[] cdFileList;
+		
+		try{
+			cdFileList = albumDirectoryParent.listFiles();
+			for(int i = 0; i < cdFileList.length; i++)
+			{
+				if (cdFileList[i].isDirectory())
+					cdList.add(cdFileList[i]);
+			}
+		}catch(NullPointerException e){
+			lblError.setText("ERROR: Invalid Directory!");
+			lblError.setVisible(true);
+			return;
+		}
+
+		if(cdList.size() < 2)
+		{
+			lblError.setText("You selected multiple CDs but there was no more than 1");
+			lblError.setVisible(true);
+			return;
+		}
+		
+		System.out.println("There are " + cdList.size() + " album folders in the working directory.\n");
+		
+		// loop through and format each cd
+		for(int cdNum = 0; cdNum < cdList.size(); cdNum++)
+			formatCD(cdList.get(cdNum).toString());
 	}
 }
