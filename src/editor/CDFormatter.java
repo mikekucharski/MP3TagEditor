@@ -32,6 +32,7 @@ public class CDFormatter {
 	private int year, trackNumber;
 	private String title, cdPath;
 	private boolean coverFound, ignoreImage;
+	private String error;
 	
 	private File albumDirectory;
 	private File[] directoryFile;
@@ -39,6 +40,7 @@ public class CDFormatter {
 	
 	public CDFormatter(String path, String genr)
 	{
+		error="";
 		genre = genr;
 		comment = "";
 		// these will be parsed from dir name
@@ -116,8 +118,10 @@ public class CDFormatter {
 		boolean dataExtracted = pullDataFromFilePath();
 		if(!dataExtracted)
 		{
-			System.out.println("\nERROR: Invalid Format. \"" + albumDirectory.getName() + "\" is not a valid directory name. " +
-								"Refer to documentation for proper name formatting. Skipping this directory.\n");
+			error = "\nERROR: Invalid Format. \"" + albumDirectory.getName() + "\" is not a valid directory name. " +
+					"Refer to documentation for proper name formatting. Skipping this directory.\n";
+			System.out.println(error);
+			menu.addTextToLog(error);
 			return;
 		}
 		modifySongMetaData();
@@ -283,9 +287,11 @@ public class CDFormatter {
 			trackNumber = getTrackNumFromFilename(splitPath.filename());
 			if(trackNumber < 1)
 			{
-				System.out.println("\n***ERROR: Invalid Format. \"" + splitPath.filename() + "." + splitPath.extension() + 
+				error = "\n***ERROR: Invalid Format. \"" + splitPath.filename() + "." + splitPath.extension() + 
 						"\" is not a valid format. Track number could not be found.\n" +
-						"***Refer to documentation for proper song format. Skipping this song.\n"); 
+						"***Refer to documentation for proper song format. Skipping this song.\n"; 
+				System.out.println(error); 
+				menu.addTextToLog(error);
 				continue;
 			}
 			
@@ -293,9 +299,11 @@ public class CDFormatter {
 			title = getSongTitleFromFilename(splitPath.filename());
 			if(title == null)
 			{
-				System.out.println("\n***ERROR: Invalid Format. \"" + splitPath.filename() + "." + splitPath.extension() + 
+				error = "\n***ERROR: Invalid Format. \"" + splitPath.filename() + "." + splitPath.extension() + 
 						"\" is not a valid format. Song name could not be found.\n" +
-						"***Refer to documentation for proper song format. Skipping this song.\n"); 
+						"***Refer to documentation for proper song format. Skipping this song.\n";
+				System.out.println(error);
+				menu.addTextToLog(error);
 				continue;
 			}
 			
